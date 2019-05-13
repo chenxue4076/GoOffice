@@ -1,9 +1,7 @@
 package go_office_common
 
-import "testing"
-
-func (r *XMLReader) TestGetElements (t *testing.T) {
+/*func (r *XMLReader) TestGetElements (t *testing.T) {
 	input := `<Person><FirstName>Xu</FirstName><LastName>Xinhua</LastName></Person>`
 	path := ""
 	r.GetElements(path, input)
-}
+}*/

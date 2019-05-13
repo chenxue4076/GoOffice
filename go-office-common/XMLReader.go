@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"io/ioutil"
-	"strings"
 )
 
 type XMLReader struct {
@@ -61,7 +60,8 @@ func (r *XMLReader) GetDomFromZip(zipFile string, xmlFile string) (content []byt
 	return nil, errors.New("No "+xmlFile+" File")
 }
 
-func (r *XMLReader) GetDomFromString(content []byte) (a interface{}) {
+func (r *XMLReader) GetDomFromString(content []byte) {
+	var a map[string][] interface{}
 	err := xml.Unmarshal(content, &a)
 	fmt.Println(a)
 	fmt.Println(err)
@@ -69,10 +69,9 @@ func (r *XMLReader) GetDomFromString(content []byte) (a interface{}) {
 		fmt.Println("test")
 		fmt.Println(err.Error())
 	}
-	return a
 }
 
-func (r *XMLReader) GetNodes(contentNode string) (a interface{}) {
+/* func (r *XMLReader) GetNodes(contentNode string) (a interface{}) {
 	err := xml.Unmarshal([]byte(contentNode), &a)
 	fmt.Println(a)
 	fmt.Println(err)
@@ -81,9 +80,9 @@ func (r *XMLReader) GetNodes(contentNode string) (a interface{}) {
 		fmt.Println(err.Error())
 	}
 	return a
-}
+} */
 
-func (r *XMLReader) GetElements(content []byte)  {
+/* func (r *XMLReader) GetElements(content []byte)  {
 	inputReader := strings.NewReader(string(content))
 	decoder := xml.NewDecoder(inputReader)
 	var t xml.Token
@@ -110,7 +109,7 @@ func (r *XMLReader) GetElements(content []byte)  {
 				//
 		}
 	}
-}
+} */
 
 
 func StringInArray(need string, needArray []string) bool {
