@@ -1,43 +1,17 @@
 package powerpoint_reader
 
 import (
+	go_office_common "GoOffice/go-office-common"
 	powerpoint_struct "GoOffice/go-office-powerpoint/struct"
 	"archive/zip"
 	"encoding/xml"
-	"github.com/pkg/errors"
+	"fmt"
 	"io/ioutil"
+	"log"
 )
 
 type PowerPointReader struct{
-	ContentTypes 	ContentTypes
-	Ppt				Ppt
-	DocProps	DocProps
-	Files		[] FileContent
-}
-type ContentTypes struct {
-	ContentTypesXml		powerpoint_struct.ContentTypesXml
-	ContentTypesXmlRels	powerpoint_struct.ContentTypesXmlRels
-}
-type DocProps struct {
-	App			powerpoint_struct.DocPropsApp
-	Core		powerpoint_struct.DocPropsCore
-	Custom		powerpoint_struct.DocPropsCustom
-}
-type Ppt struct {
-	Medias	[]interface{}
-	Slides	[]interface{}
-	Themes	[]interface{}
-	Masters	[]interface{}
-	Layouts	[]interface{}
-	Presentation	interface{}
-	PresentationRels	interface{}
-	PresProps		interface{}
-	TableStyles		interface{}
-	ViewProps		interface{}
-}
-type FileContent struct {
-	Name		string
-	Content		[]byte
+	powerpoint_struct.PowerPoint
 }
 
 func (r *PowerPointReader) LoadPowerPoint(path string) (err error) {
@@ -56,26 +30,83 @@ func (r *PowerPointReader) LoadPowerPoint(path string) (err error) {
 		if err != nil {
 			return err
 		}
-		fileContent := FileContent{file.Name, b}
+
+		fileContent := powerpoint_struct.FileContent{file.Name, b}
 		r.Files = append(r.Files, fileContent)
 	}
+	r.LoadPowerPointContents()
 	return nil
 }
 
-func ReadXmlStruct(content []byte, fileName string) ( result interface{}, err error) {
-	if fileName == "[Content_Types].xml" {
-		a := powerpoint_struct.ContentTypesXml{}
-		result = &a
-	} else if fileName == "_rels/.rels" {
-		a := powerpoint_struct.ContentTypesXmlRels{}
-		result = &a
-	} else {
-		return nil, errors.New("No struct to read file " + fileName)
+func (r *PowerPointReader) LoadPowerPointContents()  {
+	for _, file := range r.Files {
+		if file.Name == "[Content_Types].xml" {
+			 /*err := xml.Unmarshal(file.Content, &r.ContentTypes.ContentTypesXml)
+			 if err != nil {
+			 	log.Fatal(err)
+			 }*/
+			err := go_office_common.XmlWalk(file.Content, &r.ContentTypes.ContentTypesXml)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} /*else if file.Name == "_rels/.rels" {
+			err := xml.Unmarshal(file.Content, &r.ContentTypes.ContentTypesXmlRels)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "docProps/custom.xml" {
+			err := xml.Unmarshal(file.Content, &r.DocProps.Custom)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "docProps/core.xml" {
+			fmt.Println(string(file.Content))
+			err := xml.Unmarshal(file.Content, &r.DocProps.Core)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err := go_office_common.XmlWalk(file.Content, &r.DocProps.Core)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(r.DocProps.Core)
+		} else if file.Name == "docProps/app.xml" {
+			err := xml.Unmarshal(file.Content, &r.DocProps.App)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "ppt/presentation.xml" {
+			err := xml.Unmarshal(file.Content, &r.Ppts.Presentation)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "ppt/_rels/presentation.xml.rels" {
+			err := xml.Unmarshal(file.Content, &r.Ppts.PresentationRels)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "ppt/viewProps.xml" {
+			err := xml.Unmarshal(file.Content, &r.Ppts.ViewProps)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "ppt/tableStyles.xml" {
+			err := xml.Unmarshal(file.Content, &r.Ppts.TableStyles)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if file.Name == "ppt/presProps.xml" {
+			err := xml.Unmarshal(file.Content, &r.Ppts.PresProps)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}*/
 	}
-	err = xml.Unmarshal(content, result)
+	xmlStream, err := xml.MarshalIndent(r.DocProps.Core, "", "    ")
 	if err != nil {
-		return nil, err
+		fmt.Println(err.Error())
 	}
-	//fmt.Println(result)
-	return result, nil
+	fmt.Println(string(xmlStream))
 }
+
+//end file
