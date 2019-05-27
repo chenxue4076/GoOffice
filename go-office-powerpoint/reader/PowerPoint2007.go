@@ -1,7 +1,6 @@
 package powerpoint_reader
 
 import (
-	go_office_common "GoOffice/go-office-common"
 	powerpoint_struct "GoOffice/go-office-powerpoint/struct"
 	"archive/zip"
 	"encoding/xml"
@@ -41,21 +40,22 @@ func (r *PowerPointReader) LoadPowerPoint(path string) (err error) {
 func (r *PowerPointReader) LoadPowerPointContents()  {
 	for _, file := range r.Files {
 		if file.Name == "[Content_Types].xml" {
-			 /*err := xml.Unmarshal(file.Content, &r.ContentTypes.ContentTypesXml)
+			 err := xml.Unmarshal(file.Content, &r.ContentTypes.ContentTypesXml)
 			 if err != nil {
 			 	log.Fatal(err)
-			 }*/
-			err := go_office_common.XmlWalk(file.Content, &r.ContentTypes.ContentTypesXml)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} /*else if file.Name == "_rels/.rels" {
+			 }
+		} else if file.Name == "_rels/.rels" {
 			err := xml.Unmarshal(file.Content, &r.ContentTypes.ContentTypesXmlRels)
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else if file.Name == "docProps/custom.xml" {
 			err := xml.Unmarshal(file.Content, &r.DocProps.Custom)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} /*else if file.Name == "docProps/app.xml" {
+			err := xml.Unmarshal(file.Content, &r.DocProps.App)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -70,11 +70,6 @@ func (r *PowerPointReader) LoadPowerPointContents()  {
 				log.Fatal(err)
 			}
 			fmt.Println(r.DocProps.Core)
-		} else if file.Name == "docProps/app.xml" {
-			err := xml.Unmarshal(file.Content, &r.DocProps.App)
-			if err != nil {
-				log.Fatal(err)
-			}
 		} else if file.Name == "ppt/presentation.xml" {
 			err := xml.Unmarshal(file.Content, &r.Ppts.Presentation)
 			if err != nil {
@@ -102,7 +97,7 @@ func (r *PowerPointReader) LoadPowerPointContents()  {
 			}
 		}*/
 	}
-	xmlStream, err := xml.MarshalIndent(r.DocProps.Core, "", "    ")
+	xmlStream, err := xml.MarshalIndent(r.DocProps.Custom, "", "    ")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
